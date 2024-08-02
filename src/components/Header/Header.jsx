@@ -1,25 +1,28 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import colors from "../global/colors";
+import colors from "../../global/colors";
 
-const Home = () => {
+const Header = ({ title }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.content}>Home</Text>
+      <Text style={styles.text}>{title}</Text>
     </View>
   );
 };
 
-export default Home;
+export default Header;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.backgroundBlack,
+    width: "100%",
+    height: 70,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: colors.primaryBlue,
   },
-  content: {
+  text: {
+    fontSize: 22,
+    fontFamily: "Josefin",
     color: colors.white,
   },
 });

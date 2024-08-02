@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -9,12 +9,13 @@ import {
   Alert,
 } from "react-native";
 import colors from "../global/colors"; // Ajusta la ruta según tu estructura
-import * as yup from "yup";
 import { useFormik } from "formik";
 import signUpSchema from "../validations/Auth/SignUp";
-import authService from "../services/authService/authService";
+import { useRegisterMutation } from "../services/authService/authService";
 
 const SignUp = ({ navigation }) => {
+  const [register, { isLoading, error }] = useRegisterMutation();
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -25,12 +26,12 @@ const SignUp = ({ navigation }) => {
     validationSchema: signUpSchema,
     onSubmit: async (values) => {
       try {
-        const response = await authService.register(values);
-        Alert.alert(response.message);
+        const response = await register(values).unwrap(); // Manejo de respuesta
+        Alert.alert(response.message || "Registro exitoso");
         navigation.navigate("Login");
-      } catch (error) {
-        console.log("error", error);
-        Alert.alert(error.message);
+      } catch (err) {
+        console.log("Error:", err);
+        Alert.alert("Error", err.data.message || "Ha ocurrido un error");
       }
     },
   });
@@ -87,8 +88,14 @@ const SignUp = ({ navigation }) => {
           <Text style={styles.errorText}>{formik.errors.password}</Text>
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={formik.handleSubmit}>
-        <Text style={styles.buttonText}>Registrarse</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={formik.handleSubmit}
+        disabled={isLoading}
+      >
+        <Text style={styles.buttonText}>
+          {isLoading ? "Registrando..." : "Registrarse"}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.loginLink}

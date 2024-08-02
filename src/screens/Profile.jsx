@@ -2,15 +2,15 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import colors from "../global/colors";
 
-const Home = () => {
+const Profile = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.content}>Home</Text>
+      <Text style={styles.content}>Profile</Text>
     </View>
   );
 };
 
-export default Home;
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {

@@ -11,6 +11,8 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action) {
+      console.log("entre");
+      console.log(action.payload);
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.localId = action.payload.localId;

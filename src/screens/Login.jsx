@@ -8,12 +8,17 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
-import colors from "../global/colors"; // Ajusta la ruta según tu estructura
+import colors from "../global/colors";
 import { useFormik } from "formik";
 import loginSchema from "../validations/Auth/Login";
-import authService from "../services/authService/authService";
+import { useLoginMutation } from "../services/authService/authService";
+import { setUser } from "../features/Auth/AuthSlice";
+import { useDispatch } from "react-redux";
+import { ActivityIndicator } from "react-native";
 
 const Login = ({ navigation }) => {
+  const [login, { isLoading, error }] = useLoginMutation();
+  const dispatch = useDispatch();
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -22,10 +27,22 @@ const Login = ({ navigation }) => {
     validationSchema: loginSchema,
     onSubmit: async (values) => {
       try {
-        const response = await authService.login(values);
+        const response = await login(values).unwrap();
+
+        const newObj = {
+          user: {
+            email: response.user.email,
+            name: response.user.name,
+            age: response.user.age,
+          },
+          token: response.token,
+          localId: response.user._id,
+        };
+        dispatch(setUser(newObj));
         Alert.alert(response.message);
       } catch (error) {
-        Alert.alert(error.message);
+        console.log(error);
+        Alert.alert(error.data.message);
       }
     },
   });
@@ -59,9 +76,13 @@ const Login = ({ navigation }) => {
           <Text style={styles.errorText}>{formik.errors.password}</Text>
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={formik.handleSubmit}>
-        <Text style={styles.buttonText}>Iniciar sesión</Text>
-      </TouchableOpacity>
+      {isLoading ? (
+        <ActivityIndicator size="large" color={colors.primaryBlue} />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={formik.handleSubmit}>
+          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        </TouchableOpacity>
+      )}
       <TouchableOpacity
         style={styles.signupLink}
         onPress={() => navigation.navigate("SignUp")}
