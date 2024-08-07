@@ -1,6 +1,6 @@
 // src/App.js
 import React from "react";
-import { StyleSheet, SafeAreaView } from "react-native";
+import { StyleSheet, SafeAreaView, View } from "react-native";
 import { Provider } from "react-redux";
 import Navigator from "./src/navigation/Navigator";
 import { PersistGate } from "redux-persist/integration/react";

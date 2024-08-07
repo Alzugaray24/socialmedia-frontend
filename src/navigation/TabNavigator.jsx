@@ -4,8 +4,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Header from "../components/Header/Header";
 import colors from "../global/colors";
 import { FontAwesome5 } from "@expo/vector-icons";
-import Profile from "../screens/Profile";
 import Home from "../screens/Home";
+import ProfileStackNavigator from "./StackNavigator/ProfileStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +38,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 };

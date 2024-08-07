@@ -29,11 +29,15 @@ const Login = ({ navigation }) => {
       try {
         const response = await login(values).unwrap();
 
+        console.log(response);
+
         const newObj = {
           user: {
             email: response.user.email,
             name: response.user.name,
+            lastName: response.user.lastName,
             age: response.user.age,
+            id: response.user._id,
           },
           token: response.token,
           localId: response.user._id,
@@ -99,7 +103,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: colors.backgroundBlack,
   },
   title: {
     fontSize: 32,
@@ -119,8 +122,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderGray,
     borderRadius: 25,
     fontSize: 16,
-    color: colors.white,
-    backgroundColor: colors.inputBackground,
+    color: colors.backgroundBlack,
   },
   button: {
     backgroundColor: colors.primaryBlue,

@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
-import colors from "../global/colors"; // Ajusta la ruta según tu estructura
+import colors from "../global/colors";
 import { useFormik } from "formik";
 import signUpSchema from "../validations/Auth/SignUp";
 import { useRegisterMutation } from "../services/authService/authService";
@@ -19,14 +19,16 @@ const SignUp = ({ navigation }) => {
   const formik = useFormik({
     initialValues: {
       name: "",
+      lastName: "",
       email: "",
       age: "",
       password: "",
     },
     validationSchema: signUpSchema,
     onSubmit: async (values) => {
+      console.log(values);
       try {
-        const response = await register(values).unwrap(); // Manejo de respuesta
+        const response = await register(values).unwrap();
         Alert.alert(response.message || "Registro exitoso");
         navigation.navigate("Login");
       } catch (err) {
@@ -50,6 +52,17 @@ const SignUp = ({ navigation }) => {
         />
         {formik.touched.name && formik.errors.name && (
           <Text style={styles.errorText}>{formik.errors.name}</Text>
+        )}
+        <TextInput
+          style={styles.input}
+          placeholder="Apellido"
+          placeholderTextColor={colors.placeholderGray}
+          value={formik.values.lastName}
+          onChangeText={formik.handleChange("lastName")}
+          onBlur={formik.handleBlur("lastName")}
+        />
+        {formik.touched.lastName && formik.errors.lastName && (
+          <Text style={styles.errorText}>{formik.errors.lastName}</Text>
         )}
         <TextInput
           style={styles.input}
@@ -115,7 +128,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: colors.backgroundBlack,
   },
   title: {
     fontSize: 32,
@@ -135,8 +147,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderGray,
     borderRadius: 25,
     fontSize: 16,
-    color: colors.white,
-    backgroundColor: colors.inputBackground,
+    color: colors.backgroundBlack,
   },
   button: {
     backgroundColor: colors.primaryBlue,

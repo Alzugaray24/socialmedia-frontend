@@ -2,6 +2,7 @@ import * as yup from "yup";
 
 const signUpSchema = yup.object().shape({
   name: yup.string().required("Nombre es obligatorio"),
+  lastName: yup.string().required("Apellido es obligatorio"),
   email: yup
     .string()
     .email("Correo electrónico inválido")
@@ -12,9 +13,9 @@ const signUpSchema = yup.object().shape({
     .required("Edad es obligatoria")
     .positive("Edad debe ser mayor a 0")
     .integer("Edad debe ser un número entero")
-    .max(99, "Edad debe ser menor o igual a 99") // Asegura que la edad sea menor o igual a 99
+    .max(99, "Edad debe ser menor o igual a 99")
     .test("valid-age", "Edad no válida", (value) => {
-      if (value > 99) return false; // Aquí puedes agregar la lógica adicional para edades válidas
+      if (value > 99) return false;
       return true;
     }),
   password: yup

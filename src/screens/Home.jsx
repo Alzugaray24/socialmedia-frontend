@@ -15,11 +15,10 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundBlack,
     justifyContent: "center",
     alignItems: "center",
   },
   content: {
-    color: colors.white,
+    color: colors.backgroundBlack,
   },
 });
