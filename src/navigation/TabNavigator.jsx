@@ -6,6 +6,7 @@ import colors from "../global/colors";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Home from "../screens/Home";
 import ProfileStackNavigator from "./StackNavigator/ProfileStackNavigator";
+import ImageStackNavigator from "./StackNavigator/ImageStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +24,8 @@ const TabNavigator = () => {
             iconName = "user-alt";
           } else if (route.name === "Home") {
             iconName = "home";
+          } else if (route.name === "Image") {
+            iconName = "algolia";
           }
 
           return (
@@ -38,6 +41,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Image" component={ImageStackNavigator} />
       <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );

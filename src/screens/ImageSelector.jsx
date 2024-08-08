@@ -11,8 +11,8 @@ import {
 import colors from "../global/colors";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
-import { useAddImageMutation } from "../services/userService/userService";
-import { setImageProfile } from "../features/Auth/UserSlice";
+import { useAddProfileImgMutation } from "../services/userService/userService";
+import { setImageProfile } from "../features/User/UserSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,7 +20,7 @@ const ImageSelector = ({ navigation }) => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [triggerSaveProfileImage, result] = useAddImageMutation();
+  const [triggerSaveProfileImage, result] = useAddProfileImgMutation();
   const user = useSelector((state) => state.auth.user);
   const id = user.id;
 

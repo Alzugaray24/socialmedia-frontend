@@ -6,9 +6,9 @@ export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
   endpoints: (builder) => ({
-    addImage: builder.mutation({
+    addProfileImg: builder.mutation({
       query: ({ image, id }) => ({
-        url: "addImage",
+        url: "addProfileImg",
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -31,4 +31,4 @@ export const userApi = createApi({
   }),
 });
 
-export const { useAddImageMutation, useGetImageByIdQuery } = userApi;
+export const { useAddProfileImgMutation, useGetImageByIdQuery } = userApi;

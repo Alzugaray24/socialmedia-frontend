@@ -7,6 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Pressable,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import colors from "../global/colors";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -16,32 +18,71 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Modal from "react-native-modal";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetImageByIdQuery } from "../services/userService/userService";
-import { setImageProfile } from "../features/Auth/UserSlice";
+import { setImageProfile } from "../features/User/UserSlice";
+import RenderImageItem from "../components/Image/RenderImageItem";
+import { useGetAllUserImagesQuery } from "../services/imageService/imageService";
 
 const { width } = Dimensions.get("window");
 
 const Profile = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showLoading, setShowLoading] = useState(true);
   const profileImage = useSelector((state) => state.user.profileImage);
   const user = useSelector((state) => state.auth.user);
   const id = user.id;
-  const { data, error, isLoading } = useGetImageByIdQuery(id);
+  const { data, error, isLoading, refetch } = useGetImageByIdQuery(id);
   const dispatch = useDispatch();
+  const { data: userImages } = useGetAllUserImagesQuery(id);
 
-  console.log(user);
+  useEffect(() => {
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (data && data.image) {
-      console.log(data.image);
       dispatch(setImageProfile(data.image));
     }
   }, [data, dispatch]);
+
+  useEffect(() => {
+    if (!data && !isLoading && !error) {
+      const timer = setTimeout(() => {
+        refetch();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [data, isLoading, error, refetch]);
+
+  useEffect(() => {
+    // Maneja el estado de carga
+    if (isLoading) {
+      setShowLoading(true);
+    } else {
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handleImagePress = () => {};
+  const handleImagePress = (item) => {
+    console.log("Image pressed:", item);
+  };
+
+  const transformedImages = (userImages || []).map((url, index) => ({
+    id: index.toString(),
+    url,
+  }));
+
+  const renderImageItem = ({ item }) => (
+    <RenderImageItem item={item} onPress={handleImagePress} />
+  );
 
   return (
     <View style={styles.container}>
@@ -51,14 +92,24 @@ const Profile = ({ navigation }) => {
           onPress={() => navigation.navigate("ImageSelector")}
           style={styles.pressable}
         >
-          <Image
-            style={styles.profileImage}
-            source={
-              profileImage
-                ? { uri: profileImage }
-                : require("../assets/no-pic.png")
-            }
-          />
+          <View style={styles.profileImageContainer}>
+            {showLoading && isLoading ? (
+              <ActivityIndicator
+                size="large"
+                color={colors.primaryBlue}
+                style={styles.loader}
+              />
+            ) : (
+              <Image
+                style={styles.profileImage}
+                source={
+                  profileImage
+                    ? { uri: profileImage }
+                    : require("../assets/no-pic.png")
+                }
+              />
+            )}
+          </View>
         </Pressable>
         <Text style={styles.userNameText}>
           {user.name} {user.lastName}
@@ -83,13 +134,30 @@ const Profile = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.imagesContainer}>
-        <Pressable onPress={handleImagePress}>
-          <Image
-            style={styles.photo}
-            source={require("../assets/default-img.png")}
+        {showLoading ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.primaryBlue}
+            style={styles.loader}
           />
-        </Pressable>
-        {/* Agrega más imágenes según sea necesario */}
+        ) : transformedImages.length === 0 ? (
+          <Pressable onPress={handleImagePress} style={styles.noPubli}>
+            <Image
+              style={styles.photo}
+              source={require("../assets/default-img.png")}
+            />
+            <Text>No se ha realizado ninguna publicación</Text>
+          </Pressable>
+        ) : (
+          <FlatList
+            alignItems="center"
+            style={styles.listStyle}
+            data={transformedImages}
+            renderItem={renderImageItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+          />
+        )}
       </View>
 
       <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
@@ -105,12 +173,6 @@ const Profile = ({ navigation }) => {
             onPress={() => console.log("Option 2")}
           >
             <Text style={styles.modalText}>Option 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalOption}
-            onPress={() => console.log("Option 3")}
-          >
-            <Text style={styles.modalText}>Option 3</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -137,21 +199,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  profileImage: {
+  profileImageContainer: {
     position: "absolute",
-    top: -0.6 * width,
+    top: -0.55 * width,
     left: "50%",
     transform: [{ translateX: -0.2 * width }],
     height: 0.4 * width,
     width: 0.4 * width,
     borderRadius: 0.2 * width,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileImage: {
+    height: 0.4 * width,
+    width: 0.4 * width,
+    borderRadius: 0.2 * width,
   },
   userNameText: {
-    top: -0.06 * width,
+    top: -0.01 * width,
     color: colors.backgroundBlack,
     fontSize: 0.05 * width,
   },
   iconContainer: {
+    top: 0.05 * width,
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-around",
@@ -165,13 +235,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   imagesContainer: {
-    top: -0.2 * width,
-    flex: 0.2,
+    flex: 0.7,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-around",
     alignItems: "center",
     paddingHorizontal: 10,
+  },
+  noPubli: {
+    alignItems: "center",
   },
   photo: {
     height: width / 4,
@@ -195,5 +267,10 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 18,
     color: colors.backgroundBlack,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
