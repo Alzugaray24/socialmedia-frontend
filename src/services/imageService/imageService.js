@@ -19,7 +19,7 @@ export const imageApi = createApi({
 
     getAllUserImages: builder.query({
       query: (id) => ({
-        url: `getAllUserImages/${id}`, // Añade el id a la URL
+        url: `getAllUserImages/${id}`,
         method: "GET",
         headers: {
           "Content-Type": "application/json",

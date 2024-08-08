@@ -9,7 +9,6 @@ const imageSlice = createSlice({
   initialState,
   reducers: {
     setImage: (state, action) => {
-      console.log("lo guarde");
       state.allImages.push(action.payload);
     },
   },

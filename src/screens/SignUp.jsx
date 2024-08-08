@@ -1,20 +1,15 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import { StyleSheet, View, Text, SafeAreaView, Alert } from "react-native";
 import colors from "../global/colors";
 import { useFormik } from "formik";
 import signUpSchema from "../validations/Auth/SignUp";
 import { useRegisterMutation } from "../services/authService/authService";
+import TextInputField from "../components/Auth/TextInputField";
+import SubmitButton from "../components/Auth/SubmitButton";
+import NavigationLink from "../components/Auth/NavigationLink";
 
 const SignUp = ({ navigation }) => {
-  const [register, { isLoading, error }] = useRegisterMutation();
+  const [register, { isLoading }] = useRegisterMutation();
 
   const formik = useFormik({
     initialValues: {
@@ -26,7 +21,6 @@ const SignUp = ({ navigation }) => {
     },
     validationSchema: signUpSchema,
     onSubmit: async (values) => {
-      console.log(values);
       try {
         const response = await register(values).unwrap();
         Alert.alert(response.message || "Registro exitoso");
@@ -42,82 +36,59 @@ const SignUp = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Registro</Text>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Nombre"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.name}
           onChangeText={formik.handleChange("name")}
           onBlur={formik.handleBlur("name")}
+          error={formik.errors.name}
+          touched={formik.touched.name}
         />
-        {formik.touched.name && formik.errors.name && (
-          <Text style={styles.errorText}>{formik.errors.name}</Text>
-        )}
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Apellido"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.lastName}
           onChangeText={formik.handleChange("lastName")}
           onBlur={formik.handleBlur("lastName")}
+          error={formik.errors.lastName}
+          touched={formik.touched.lastName}
         />
-        {formik.touched.lastName && formik.errors.lastName && (
-          <Text style={styles.errorText}>{formik.errors.lastName}</Text>
-        )}
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Correo electrónico"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.email}
           onChangeText={formik.handleChange("email")}
           onBlur={formik.handleBlur("email")}
+          error={formik.errors.email}
+          touched={formik.touched.email}
           keyboardType="email-address"
         />
-        {formik.touched.email && formik.errors.email && (
-          <Text style={styles.errorText}>{formik.errors.email}</Text>
-        )}
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Edad"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.age}
           onChangeText={formik.handleChange("age")}
           onBlur={formik.handleBlur("age")}
+          error={formik.errors.age}
+          touched={formik.touched.age}
           keyboardType="numeric"
         />
-        {formik.touched.age && formik.errors.age && (
-          <Text style={styles.errorText}>{formik.errors.age}</Text>
-        )}
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Contraseña"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.password}
           onChangeText={formik.handleChange("password")}
           onBlur={formik.handleBlur("password")}
+          error={formik.errors.password}
+          touched={formik.touched.password}
           secureTextEntry
         />
-        {formik.touched.password && formik.errors.password && (
-          <Text style={styles.errorText}>{formik.errors.password}</Text>
-        )}
       </View>
-      <TouchableOpacity
-        style={styles.button}
+      <SubmitButton
         onPress={formik.handleSubmit}
-        disabled={isLoading}
-      >
-        <Text style={styles.buttonText}>
-          {isLoading ? "Registrando..." : "Registrarse"}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.loginLink}
+        isLoading={isLoading}
+        text="Registrarse"
+      />
+      <NavigationLink
         onPress={() => navigation.navigate("Login")}
-      >
-        <Text style={styles.loginText}>
-          ¿Ya tienes una cuenta? Inicia sesión
-        </Text>
-      </TouchableOpacity>
+        text="¿Ya tienes una cuenta? Inicia sesión"
+      />
     </SafeAreaView>
   );
 };
@@ -138,40 +109,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: "90%",
     marginBottom: 16,
-  },
-  input: {
-    width: "100%",
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.borderGray,
-    borderRadius: 25,
-    fontSize: 16,
-    color: colors.backgroundBlack,
-  },
-  button: {
-    backgroundColor: colors.primaryBlue,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 25,
-    marginBottom: 16,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  loginLink: {
-    marginTop: 16,
-  },
-  loginText: {
-    color: colors.primaryBlue,
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 12,
   },
 });
 

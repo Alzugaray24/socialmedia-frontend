@@ -1,24 +1,26 @@
 import React from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   SafeAreaView,
+  StyleSheet,
   Alert,
+  ActivityIndicator,
+  Text,
+  View,
 } from "react-native";
-import colors from "../global/colors";
 import { useFormik } from "formik";
 import loginSchema from "../validations/Auth/Login";
 import { useLoginMutation } from "../services/authService/authService";
 import { setUser } from "../features/Auth/AuthSlice";
 import { useDispatch } from "react-redux";
-import { ActivityIndicator } from "react-native";
+import TextInputField from "../components/Auth/TextInputField";
+import SubmitButton from "../components/Auth/SubmitButton";
+import NavigationLink from "../components/Auth/NavigationLink";
+import colors from "../global/colors";
 
 const Login = ({ navigation }) => {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -55,44 +57,37 @@ const Login = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Iniciar sesión</Text>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Correo electrónico"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.email}
           onChangeText={formik.handleChange("email")}
           onBlur={formik.handleBlur("email")}
+          errorMessage={formik.touched.email && formik.errors.email}
           keyboardType="email-address"
         />
-        {formik.touched.email && formik.errors.email && (
-          <Text style={styles.errorText}>{formik.errors.email}</Text>
-        )}
-        <TextInput
-          style={styles.input}
+        <TextInputField
           placeholder="Contraseña"
-          placeholderTextColor={colors.placeholderGray}
           value={formik.values.password}
           onChangeText={formik.handleChange("password")}
           onBlur={formik.handleBlur("password")}
+          errorMessage={formik.touched.password && formik.errors.password}
           secureTextEntry
         />
-        {formik.touched.password && formik.errors.password && (
-          <Text style={styles.errorText}>{formik.errors.password}</Text>
-        )}
       </View>
       {isLoading ? (
         <ActivityIndicator size="large" color={colors.primaryBlue} />
       ) : (
-        <TouchableOpacity style={styles.button} onPress={formik.handleSubmit}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
+        <SubmitButton
+          onPress={formik.handleSubmit}
+          isLoading={isLoading}
+          text="Login"
+        />
       )}
-      <TouchableOpacity
-        style={styles.signupLink}
+      <NavigationLink
+        text="¿No tienes una cuenta? Regístrate"
         onPress={() => navigation.navigate("SignUp")}
-      >
-        <Text style={styles.signupText}>¿No tienes una cuenta? Regístrate</Text>
-      </TouchableOpacity>
+        style={styles.signupLink}
+      />
     </SafeAreaView>
   );
 };
@@ -114,39 +109,9 @@ const styles = StyleSheet.create({
     width: "90%",
     marginBottom: 16,
   },
-  input: {
-    width: "100%",
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.borderGray,
-    borderRadius: 25,
-    fontSize: 16,
-    color: colors.backgroundBlack,
-  },
-  button: {
-    backgroundColor: colors.primaryBlue,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 25,
-    marginBottom: 16,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   signupLink: {
     marginTop: 16,
-  },
-  signupText: {
     color: colors.primaryBlue,
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 12,
   },
 });
 

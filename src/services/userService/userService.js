@@ -19,12 +19,12 @@ export const userApi = createApi({
     getImageById: builder.query({
       query: (id) => {
         return {
-          url: `getImage/${id}`, // Ajusta la URL según la ruta en tu backend
+          url: `getImage/${id}`,
           method: "GET",
         };
       },
       transformResponse: (response) => {
-        console.log("Response from server:", response); // Log para depuración
+        console.log("Response from server:", response);
         return response;
       },
     }),

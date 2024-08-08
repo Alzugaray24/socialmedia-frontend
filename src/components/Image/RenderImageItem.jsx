@@ -13,8 +13,8 @@ const RenderImageItem = ({ item, onPress }) => {
 
 const styles = StyleSheet.create({
   photo: {
-    height: 170, // Ajusta el tamaño según tus necesidades
-    width: 170, // Ajusta el tamaño según tus necesidades
+    height: 170,
+    width: 170,
     marginHorizontal: 10,
     marginBottom: 15,
     borderRadius: 10,

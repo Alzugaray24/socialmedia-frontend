@@ -4,25 +4,19 @@ import {
   Text,
   View,
   Image,
-  Dimensions,
-  TouchableOpacity,
   Pressable,
   FlatList,
   ActivityIndicator,
 } from "react-native";
 import colors from "../global/colors";
-import { FontAwesome5 } from "@expo/vector-icons";
-import Feather from "@expo/vector-icons/Feather";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import Modal from "react-native-modal";
+import ProfileImage from "../components/Profile/ProfileImage";
+import IconButton from "../components/Shared/IconButton";
+import ImageGrid from "../components/Profile/ImageGrid";
+import ProfileModal from "../components/Profile/ProfileModal";
 import { useSelector, useDispatch } from "react-redux";
 import { useGetImageByIdQuery } from "../services/userService/userService";
 import { setImageProfile } from "../features/User/UserSlice";
-import RenderImageItem from "../components/Image/RenderImageItem";
 import { useGetAllUserImagesQuery } from "../services/imageService/imageService";
-
-const { width } = Dimensions.get("window");
 
 const Profile = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -55,7 +49,6 @@ const Profile = ({ navigation }) => {
   }, [data, isLoading, error, refetch]);
 
   useEffect(() => {
-    // Maneja el estado de carga
     if (isLoading) {
       setShowLoading(true);
     } else {
@@ -80,10 +73,6 @@ const Profile = ({ navigation }) => {
     url,
   }));
 
-  const renderImageItem = ({ item }) => (
-    <RenderImageItem item={item} onPress={handleImagePress} />
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}></View>
@@ -100,13 +89,13 @@ const Profile = ({ navigation }) => {
                 style={styles.loader}
               />
             ) : (
-              <Image
-                style={styles.profileImage}
+              <ProfileImage
                 source={
                   profileImage
                     ? { uri: profileImage }
                     : require("../assets/no-pic.png")
                 }
+                loading={showLoading && isLoading}
               />
             )}
           </View>
@@ -115,22 +104,26 @@ const Profile = ({ navigation }) => {
           {user.name} {user.lastName}
         </Text>
         <View style={styles.iconContainer}>
-          <View style={styles.iconWrapper}>
-            <FontAwesome5 name="user-friends" size={24} color="black" />
-            <Text style={styles.iconLabel}>Friends</Text>
-          </View>
-          <View style={styles.iconWrapper}>
-            <AntDesign name="message1" size={24} color="black" />
-            <Text style={styles.iconLabel}>Message</Text>
-          </View>
-          <View style={styles.iconWrapper}>
-            <SimpleLineIcons name="user-following" size={24} color="black" />
-            <Text style={styles.iconLabel}>Following</Text>
-          </View>
-          <TouchableOpacity style={styles.iconWrapper} onPress={toggleModal}>
-            <Feather name="more-horizontal" size={24} color="black" />
-            <Text style={styles.iconLabel}>More</Text>
-          </TouchableOpacity>
+          <IconButton
+            iconName="user-friends"
+            label="Friends"
+            onPress={() => console.log("Friends pressed")}
+          />
+          <IconButton
+            iconName="message1"
+            label="Message"
+            onPress={() => console.log("Message pressed")}
+          />
+          <IconButton
+            iconName="user-following"
+            label="Following"
+            onPress={() => console.log("Following pressed")}
+          />
+          <IconButton
+            iconName="more-horizontal"
+            label="More"
+            onPress={toggleModal}
+          />
         </View>
       </View>
       <View style={styles.imagesContainer}>
@@ -149,38 +142,17 @@ const Profile = ({ navigation }) => {
             <Text>No se ha realizado ninguna publicación</Text>
           </Pressable>
         ) : (
-          <FlatList
-            alignItems="center"
-            style={styles.listStyle}
-            data={transformedImages}
-            renderItem={renderImageItem}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
+          <ImageGrid
+            images={transformedImages}
+            onImagePress={handleImagePress}
           />
         )}
       </View>
 
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-        <View style={styles.modalContent}>
-          <TouchableOpacity
-            style={styles.modalOption}
-            onPress={() => console.log("Option 1")}
-          >
-            <Text style={styles.modalText}>Option 1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalOption}
-            onPress={() => console.log("Option 2")}
-          >
-            <Text style={styles.modalText}>Option 2</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <ProfileModal isVisible={isModalVisible} toggleModal={toggleModal} />
     </View>
   );
 };
-
-export default Profile;
 
 const styles = StyleSheet.create({
   container: {
@@ -188,85 +160,60 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   headerContainer: {
-    flex: 0.3,
+    flex: 1.5,
     backgroundColor: colors.buttonHoverBlue,
   },
   pressable: {
     position: "absolute",
-  },
-  contentContainer: {
-    flex: 0.5,
-    alignItems: "center",
-    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+    top: "-45%", // Adjust this percentage to position the image between the header and content
+    left: "50%",
+    transform: [{ translateX: -75 }], // Adjust the translation value to center the image horizontally
   },
   profileImageContainer: {
-    position: "absolute",
-    top: -0.55 * width,
-    left: "50%",
-    transform: [{ translateX: -0.2 * width }],
-    height: 0.4 * width,
-    width: 0.4 * width,
-    borderRadius: 0.2 * width,
+    width: 150,
+    height: 150,
+    borderRadius: 75, // Half of width/height to make it circular
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white", // Add a background color if needed
+    borderWidth: 2, // Add border if needed
+    borderColor: colors.primaryBlue, // Color of the border
   },
   profileImage: {
-    height: 0.4 * width,
-    width: 0.4 * width,
-    borderRadius: 0.2 * width,
+    height: "100%",
+    width: "100%",
+    borderRadius: 75, // Same value as profileImageContainer
+  },
+  contentContainer: {
+    flex: 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
   userNameText: {
-    top: -0.01 * width,
+    marginTop: "10%",
     color: colors.backgroundBlack,
-    fontSize: 0.05 * width,
+    fontSize: 20,
   },
   iconContainer: {
-    top: 0.05 * width,
     flexDirection: "row",
-    width: "100%",
+    width: "80%",
     justifyContent: "space-around",
-  },
-  iconWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  iconLabel: {
-    marginTop: 4,
-    fontSize: 16,
+    marginTop: "5%",
   },
   imagesContainer: {
-    flex: 0.7,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
+    flex: 3,
     alignItems: "center",
-    paddingHorizontal: 10,
   },
   noPubli: {
     alignItems: "center",
   },
   photo: {
-    height: width / 4,
-    width: width / 4,
-    margin: 5,
+    height: "20%",
+    width: "20%",
+    margin: "2%",
     borderRadius: 10,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalOption: {
-    marginBottom: 15,
-    padding: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  modalText: {
-    fontSize: 18,
-    color: colors.backgroundBlack,
   },
   loader: {
     flex: 1,
@@ -274,3 +221,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default Profile;
